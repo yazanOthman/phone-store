@@ -6,6 +6,7 @@ import ProductList from "../src/components/ProductList";
 import Details from "../src/components/Details";
 import Cart from "../src/components/Cart";
 import NotFound from "../src/components/NotFound";
+import Modal from "./components/Modal";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Modal />
     </>
   );
 }
