@@ -27,18 +27,41 @@ const ProductProvider = ({ children }) => {
     return product;
   };
 
-  const increment = (id) => {
-    console.log("this is increment method");
-  };
-  const decrement = (id) => {
-    console.log("this is decrement method");
+  const calculatePrice = (id, type) => {
+    setStateContext((prevValue) => {
+      const tempCart = [...prevValue.cart];
+      const selectedProduct = tempCart.find((item) => item.id === id);
+      const index = tempCart.indexOf(selectedProduct);
+      const product = tempCart[index];
+      product.count =
+        type === "increment" ? product.count + 1 : product.count - 1;
+      product.total = product.price * product.count;
+      if (product.count === 0) {
+        removeItem(id);
+      }
+      addTotal();
+      return {
+        ...prevValue,
+        cart: [...tempCart],
+      };
+    });
   };
   const removeItem = (id) => {
-    const removedItem = stateContext.cart.filter((item) => item.id !== id);
-    setStateContext((prevValue) => ({
-      ...prevValue,
-      cart: [...stateContext.cart, ...removedItem],
-    }));
+    setStateContext((prevValue) => {
+      const tempProducts = [...prevValue.products];
+      const removedItem = [...prevValue.cart].filter((item) => item.id !== id);
+      const index = tempProducts.indexOf(getProduct(id));
+      const removedProduct = tempProducts[index];
+      removedProduct.inCart = false;
+      removedProduct.count = 0;
+      removedProduct.total = 0;
+      addTotal();
+      return {
+        ...prevValue,
+        products: [...tempProducts],
+        cart: [...removedItem],
+      };
+    });
     console.log("this is removeitem method");
   };
 
@@ -46,6 +69,10 @@ const ProductProvider = ({ children }) => {
     setStateContext((prevValue) => ({
       ...prevValue,
       cart: [],
+      products: setProducts(),
+      cartSubtotal: 0,
+      cartTax: 0,
+      cartTotal: 0,
     }));
     console.log("cart is cleared");
   };
@@ -65,12 +92,14 @@ const ProductProvider = ({ children }) => {
     product.count = 1;
     const price = product.price;
     product.total = price;
-    setStateContext((prevValue) => ({
-      ...prevValue,
-      detailProduct: { ...detailProduct, ...product },
-      products: [...tempProduct],
-      cart: [...stateContext.cart, product],
-    }));
+    setStateContext((prevValue) => {
+      return {
+        ...prevValue,
+        products: [...tempProduct],
+        cart: [...prevValue.cart, product],
+      };
+    });
+    addTotal();
   };
 
   const openModal = (id) => {
@@ -86,6 +115,24 @@ const ProductProvider = ({ children }) => {
     setStateContext((prevValue) => ({ ...prevValue, modalOpen: false }));
   };
 
+  const addTotal = () => {
+    setStateContext((prevValue) => {
+      const subTotal = prevValue.cart?.reduce((accu, item) => {
+        accu += item.total;
+        return accu;
+      }, 0);
+      const tempTax = subTotal * 0.1;
+      const tax = parseFloat(tempTax.toFixed(2));
+      const total = subTotal + tax;
+      return {
+        ...prevValue,
+        cartTotal: total,
+        cartTax: tax,
+        cartSubtotal: subTotal,
+      };
+    });
+  };
+
   useEffect(() => {
     setStateContext((prevValue) => ({
       ...prevValue,
@@ -93,8 +140,7 @@ const ProductProvider = ({ children }) => {
       handleDetails,
       openModal,
       closeModal,
-      increment,
-      decrement,
+      calculatePrice,
       removeItem,
       clearCart,
     }));

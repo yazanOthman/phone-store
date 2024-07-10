@@ -5,7 +5,6 @@ import { ProductContext } from "./ProductProvider";
 
 const ProductList = () => {
   const { products } = useContext(ProductContext);
-  console.log("products", products);
   return (
     <>
       <div className="py-5">

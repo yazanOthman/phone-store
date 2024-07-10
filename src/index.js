@@ -8,13 +8,11 @@ import ProductProvider from "./components/ProductProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <ProductProvider>
-      <Router>
-        <App />
-      </Router>
-    </ProductProvider>
-  </React.StrictMode>
+  <ProductProvider>
+    <Router>
+      <App />
+    </Router>
+  </ProductProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
