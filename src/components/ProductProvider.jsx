@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { detailProduct, storeProducts } from "../data";
 
 export const ProductContext = createContext();
@@ -27,7 +27,7 @@ const ProductProvider = ({ children }) => {
     return product;
   };
 
-  const calculatePrice = (id, type) => {
+  const calculatePrice = useCallback((id, type) => {
     setStateContext((prevValue) => {
       const tempCart = [...prevValue.cart];
       const selectedProduct = tempCart.find((item) => item.id === id);
@@ -45,8 +45,9 @@ const ProductProvider = ({ children }) => {
         cart: [...tempCart],
       };
     });
-  };
-  const removeItem = (id) => {
+  }, []);
+
+  const removeItem = useCallback((id) => {
     setStateContext((prevValue) => {
       const tempProducts = [...prevValue.products];
       const removedItem = [...prevValue.cart].filter((item) => item.id !== id);
@@ -62,10 +63,9 @@ const ProductProvider = ({ children }) => {
         cart: [...removedItem],
       };
     });
-    console.log("this is removeitem method");
-  };
+  }, []);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setStateContext((prevValue) => ({
       ...prevValue,
       cart: [],
@@ -74,17 +74,17 @@ const ProductProvider = ({ children }) => {
       cartTax: 0,
       cartTotal: 0,
     }));
-    console.log("cart is cleared");
-  };
+  }, []);
 
-  const handleDetails = (id) => {
+  const handleDetails = useCallback((id) => {
     const product = getProduct(id);
     setStateContext((prevValue) => ({
       ...prevValue,
       detailProduct: { ...detailProduct, ...product },
     }));
-  };
-  const addToCart = (id) => {
+  }, []);
+
+  const addToCart = useCallback((id) => {
     const tempProduct = [...stateContext.products];
     const index = tempProduct.indexOf(getProduct(id));
     const product = tempProduct[index];
@@ -100,22 +100,22 @@ const ProductProvider = ({ children }) => {
       };
     });
     addTotal();
-  };
+  }, []);
 
-  const openModal = (id) => {
+  const openModal = useCallback((id) => {
     const product = getProduct(id);
     setStateContext((prevValue) => ({
       ...prevValue,
       modalProduct: product,
       modalOpen: true,
     }));
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setStateContext((prevValue) => ({ ...prevValue, modalOpen: false }));
-  };
+  }, []);
 
-  const addTotal = () => {
+  const addTotal = useCallback(() => {
     setStateContext((prevValue) => {
       const subTotal = prevValue.cart?.reduce((accu, item) => {
         accu += item.total;
@@ -131,7 +131,7 @@ const ProductProvider = ({ children }) => {
         cartSubtotal: subTotal,
       };
     });
-  };
+  }, []);
 
   useEffect(() => {
     setStateContext((prevValue) => ({
@@ -144,7 +144,15 @@ const ProductProvider = ({ children }) => {
       removeItem,
       clearCart,
     }));
-  }, []);
+  }, [
+    addToCart,
+    handleDetails,
+    openModal,
+    closeModal,
+    calculatePrice,
+    removeItem,
+    clearCart,
+  ]);
 
   return (
     <ProductContext.Provider value={stateContext}>
