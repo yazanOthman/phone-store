@@ -49,3 +49,12 @@ body{
 .text-right {
   text-align: right!important;
 }
+
+.buttons-container{
+  float: right!important;
+  margin-top: 10px !important;
+}
+
+.paypal-button-row   .paypal-button-shape-rect{
+  height: 100px !important;
+}
