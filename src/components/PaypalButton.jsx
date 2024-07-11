@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 const PaypalButton = ({ cartTotal, clearCart }) => {
   const navigate = useNavigate();
   const initialOptions = {
-    clientId:
-      "Ach-Xn3QmhQYc6SlzjjUMO9_O3Mr-S89gGkFR261oaqFYD2h0BrpZqG6RyiTim5rnKHZqRAoh7-1CLhx",
+    clientId: process.env.REACT_APP_PAYPAL_SECRET,
     currency: "USD",
     intent: "capture",
   };
